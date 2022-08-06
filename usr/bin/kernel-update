@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Update script for sys-kernel/gentoo-sources
+# This script is NOT tested with a kernel (previously) compiled by genkernel
+
+selected_kernel=""
+kernel_base_directory="/usr/src/"
+kernel_directory=""
+
+
+usage() {
+    printf "Usage: $0 -k=[<selected_kernel>]\n"
+    printf "Usage: $0 --kernel=[<selected_kernel>]\n"
+    printf "Usage: $0 --latest\n\n"
+    printf "<selected_kernel> is the full kernel version string.\n"
+    printf "If the '--latest' (without the quotation marks) option is used, the latest available kernel version will be compiled.\n\n"
+    printf "Available kernel versions (current active version is marked with an asterisk):\n`eselect kernel list`\n" 1>&2;
+
+    exit 1;
+}
+
+
+for i in "$@"; do
+    case $i in
+        -k=*|--kernel=*)
+            selected_kernel="${i#*=}"
+            shift
+            ;;
+
+        --latest)
+            selected_kernel=$(eselect kernel list | tail -1 | awk '{print $2}' | sed 's/[][]//g')
+            ;;
+
+        -*|--*)
+            echo "Unknown option $i"
+            exit 1
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+
+# if no kernel is selected, show help text
+if [ -z "${selected_kernel}" ] ; then
+    usage
+fi
+
+
+#set the new kernel directory
+kernel_directory="${kernel_base_directory}${selected_kernel}"
+
+
+# compiling new kernel
+compile_new_kernel() {
+    echo "New Kernel Version: ${selected_kernel}"
+
+    echo "Entering kernel directory: ${kernel_directory}";
+    cd ${kernel_directory}
+
+    echo "Copying kernel configuration";
+    cp /usr/src/linux/.config .
+
+    echo "Switching symlink to new kernel";
+    eselect kernel set ${selected_kernel}
+
+    echo "Applying config via 'make olddefconfig'";
+    make olddefconfig
+
+    echo "Building new kernel";
+    make -j12
+
+    echo "Building modules";
+    make modules
+
+    echo "Installing modules";
+    make modules_install
+
+    echo "Installing new kernel";
+    make install
+
+    echo "Configuring grub2";
+    cp /boot/grub/grub.cfg /boot/grub/grub.cfg.bak
+    GRUB_USE_LINUX_LABEL=true grub-mkconfig -o /boot/grub/grub.cfg
+
+    echo "Re-compile kernel dependant modules";
+    # emerge -av @module-rebuild
+    update-kernel-modules
+
+    echo "Kernel update complete. You may restart your computer now."
+    echo "Feel free to run 'eclean-kernel -n 2' to cleanup old kernel files but keep the latest 2."
+}
+
+
+if [ -d ${kernel_directory} ] ; then
+    current_kernel_version=$(uname -r)
+
+    if [ ${selected_kernel} == "linux-${current_kernel_version}" ] ; then
+        echo "You are currently running this kernel version."
+        echo "Exiting!";
+        exit;
+    else
+        compile_new_kernel
+    fi
+else
+    echo "Error: Directory ${kernel_directory} does not exist."
+    echo "Exiting!";
+    exit;
+fi

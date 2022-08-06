@@ -1,2 +1,1 @@
-# gentoo-helper
-Collection of Gentoo related helper scripts
+# Collection of Gentoo related helper scripts
