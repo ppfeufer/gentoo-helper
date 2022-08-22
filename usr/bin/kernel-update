@@ -7,14 +7,42 @@ selected_kernel=""
 kernel_base_directory="/usr/src/"
 kernel_directory=""
 
+run_eclean_kernel=False
+number_of_kernel_to_keep=1
+
+
+declare -A is_installed
+
+is_installed=(
+    ['eclean-kernel']=False
+)
+
+for key in ${!is_installed[@]}; do
+    if command -v ${key} > /dev/null
+        then
+            is_installed["${key}"]=True
+    fi
+done
+
 
 usage() {
-    printf "Usage: $0 -k=[<selected_kernel>]\n"
-    printf "Usage: $0 --kernel=[<selected_kernel>]\n"
-    printf "Usage: $0 --latest\n\n"
-    printf "<selected_kernel> is the full kernel version string.\n"
-    printf "If the '--latest' (without the quotation marks) option is used, the latest available kernel version will be compiled.\n\n"
-    printf "Available kernel versions (current active version is marked with an asterisk):\n`eselect kernel list`\n" 1>&2;
+    printf "Usage:\n"
+    printf "\t$0 [OPTION]\n"
+
+    printf "\nExample:\n"
+    printf "\t$0 --latest\t\t\t\tTo compile the latest kernel\n"
+    printf "\t$0 --eclean-kernel=2\t\tTo keep the latest 2 kernels in /boot/ for grub to detect\n"
+    printf "\t$0 --kernel=linux-5.17.7-gentoo\tTo compile a specific kernel version. (See available kernel versions below)\n"
+
+    printf "\nOptions:\n"
+    printf "\t-k, --kernel\t\tThe kernel version you want to compile, see available kernel versions (Example: -k=linux-5.17.7-gentoo)\n"
+
+    printf "\t-e, --eclean-kernel\tThe number of kernels to keep in /boot/ for grub to detect (Example: -e=2 to keep the latest 2)\n"
+    printf "\t\t\t\tThis parameter is only considered if 'eclean-kernel' is installed.\n"
+
+    printf "\t-l, --latest\t\tCompile the latest available kernel\n"
+
+    printf "\nAvailable kernel versions (current active version is marked with an asterisk):\n`eselect kernel list`\n" 1>&2;
 
     exit 1;
 }
@@ -27,7 +55,25 @@ for i in "$@"; do
             shift
             ;;
 
-        --latest)
+        -e=* | --eclean-kernel=*)
+            program_to_check="eclean-kernel"
+
+            if [ ${is_installed["${program_to_check}"]} == True ]
+                then
+                    re='^[0-9]+$'
+                    if ! [[ ${i#*=} =~ ${re} ]] ; then
+                       echo "Error: Not a number" >&2; exit 1
+                    fi
+
+                    run_eclean_kernel=True
+                    number_of_kernel_to_keep=${i#*=}
+                else
+                    printf "Program 'eclean-kernel' is NOT installed. Ignoring parameter ...\n"
+                    printf "To use this feature, install 'eclean-kernel' via 'emerge eclean-kernel'\n"
+            fi
+            ;;
+
+        -l | --latest)
             selected_kernel=$(eselect kernel list | tail -1 | awk '{print $2}' | sed 's/[][]//g')
             ;;
 
@@ -82,15 +128,28 @@ compile_new_kernel() {
     make install
 
     echo "Configuring grub2";
+    export GRUB_USE_LINUX_LABEL=true
     cp /boot/grub/grub.cfg /boot/grub/grub.cfg.bak
-    GRUB_USE_LINUX_LABEL=true grub-mkconfig -o /boot/grub/grub.cfg
+
+    if [ ${run_eclean_kernel} == True ]
+    then
+        echo "Cleaning up old kernel files but keeping the latest ${number_of_kernel_to_keep}";
+
+        eclean-kernel -n ${number_of_kernel_to_keep}
+    else
+        grub-mkconfig -o /boot/grub/grub.cfg
+    fi
 
     echo "Re-compile kernel dependant modules";
     # emerge -av @module-rebuild
     update-kernel-modules
 
     echo "Kernel update complete. You may restart your computer now."
-    echo "Feel free to run 'eclean-kernel -n 2' to cleanup old kernel files but keep the latest 2."
+
+    if [ ${run_eclean_kernel} == False ]
+        then
+            echo "Feel free to run 'eclean-kernel -n 2' to cleanup old kernel files but keep the latest 2."
+    fi
 }
 
 
@@ -100,6 +159,7 @@ if [ -d ${kernel_directory} ] ; then
     if [ ${selected_kernel} == "linux-${current_kernel_version}" ] ; then
         echo "You are currently running this kernel version."
         echo "Exiting!";
+
         exit;
     else
         compile_new_kernel
@@ -107,5 +167,6 @@ if [ -d ${kernel_directory} ] ; then
 else
     echo "Error: Directory ${kernel_directory} does not exist."
     echo "Exiting!";
+
     exit;
 fi
