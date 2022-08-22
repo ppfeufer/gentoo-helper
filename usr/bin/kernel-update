@@ -149,8 +149,7 @@ compile_new_kernel() {
     fi
 
     echo "Re-compile kernel dependant modules";
-    # emerge -av @module-rebuild
-    update-kernel-modules
+    emerge @module-rebuild
 
     echo "Kernel update complete. You may restart your computer now."
 
