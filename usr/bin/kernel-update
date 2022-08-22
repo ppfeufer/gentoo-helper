@@ -6,6 +6,7 @@
 selected_kernel=""
 kernel_base_directory="/usr/src/"
 kernel_directory=""
+use_latest_kernel=False
 
 run_eclean_kernel=False
 number_of_kernel_to_keep=1
@@ -59,8 +60,9 @@ for i in "$@"; do
             if [ ${is_installed["${program_to_check}"]} == True ]
                 then
                     re='^[0-9]+$'
-                    if ! [[ ${i#*=} =~ ${re} ]] ; then
-                       echo "Error: Not a number" >&2; exit 1
+                    if ! [[ ${i#*=} =~ ${re} ]]
+                        then
+                            echo "Error: Not a number" >&2; exit 1
                     fi
 
                     run_eclean_kernel=True
@@ -72,7 +74,7 @@ for i in "$@"; do
             ;;
 
         -l | --latest)
-            selected_kernel=$(eselect kernel list | tail -1 | awk '{print $2}' | sed 's/[][]//g')
+            use_latest_kernel=True
             ;;
 
         -* | --*)
@@ -87,9 +89,17 @@ for i in "$@"; do
 done
 
 
+# If the latest available kernel should be compiled, make sure -k, --kernel are ignored
+if [ ${use_latest_kernel} == True ]
+    then
+        selected_kernel=$(eselect kernel list | tail -1 | awk '{print $2}' | sed 's/[][]//g')
+fi
+
+
 # if no kernel is selected, show help text
-if [ -z "${selected_kernel}" ] ; then
-    usage
+if [ -z "${selected_kernel}" ]
+    then
+        usage
 fi
 
 
