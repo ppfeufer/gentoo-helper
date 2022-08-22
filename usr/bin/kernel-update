@@ -11,9 +11,7 @@ run_eclean_kernel=False
 number_of_kernel_to_keep=1
 
 
-declare -A is_installed
-
-is_installed=(
+declare -A is_installed=(
     ['eclean-kernel']=False
 )
 
