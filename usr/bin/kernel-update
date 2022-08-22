@@ -22,7 +22,7 @@ usage() {
 
 for i in "$@"; do
     case $i in
-        -k=*|--kernel=*)
+        -k=* | --kernel=*)
             selected_kernel="${i#*=}"
             shift
             ;;
@@ -31,10 +31,11 @@ for i in "$@"; do
             selected_kernel=$(eselect kernel list | tail -1 | awk '{print $2}' | sed 's/[][]//g')
             ;;
 
-        -*|--*)
+        -* | --*)
             echo "Unknown option $i"
             exit 1
             ;;
+
         *)
             usage
             ;;
