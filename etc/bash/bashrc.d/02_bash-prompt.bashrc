@@ -45,7 +45,7 @@ set_versioning_system_branch() {
 
 # Determine active Python virtualenv details.
 set_python_virtual_environment () {
-    if test -z "$VIRTUAL_ENV"
+    if [ -z "$VIRTUAL_ENV" ]
         then
             python_virtual_environment=""
         else
