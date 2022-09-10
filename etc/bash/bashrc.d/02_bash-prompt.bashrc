@@ -26,16 +26,16 @@ parse_hg_branch() {
 
 # Set the versioning system branch name
 set_versioning_system_branch() {
-    # First, let's see if it's a git branch
+    # Let's see if it's a git branch
     versioning_system_branch=$(parse_git_branch)
 
-    # If not git then maybe SVN
+    # Or maybe SVN
     if [ "$versioning_system_branch" == "" ]
         then
             versioning_system_branch=$(parse_svn_branch)
     fi
 
-    # Or Mercurial
+    # Or even Mercurial
     if [ "$versioning_system_branch" == "" ]
         then
             versioning_system_branch=$(parse_hg_branch)
