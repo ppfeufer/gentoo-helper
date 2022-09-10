@@ -64,7 +64,7 @@ set_bash_prompt() {
 
     if [[ ${EUID} == 0 ]] ; then
         # root
-        PS1="${BRed}\h${BBlue} \W \$${Red}${versioning_system_branch}${Color_Off} "
+        PS1="${python_virtual_environment}${BRed}\u@\h${BBlue} \W \$${Red}${versioning_system_branch}${Color_Off} "
     else
         # normal user
         PS1="${python_virtual_environment}${BGreen}\u@\h${BBlue} \w \$${Red}${versioning_system_branch}${Color_Off} "
