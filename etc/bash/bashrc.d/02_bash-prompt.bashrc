@@ -1,6 +1,68 @@
+#!/usr/bin/env bash
+
 # Git
+#parse_git_branch() {
+#    # Either
+##    git name-rev HEAD 2> /dev/null | sed 's#HEAD\ \(.*\)# (git » \1)#'
+#
+#    # Or
+#    git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/ (git » \1)/p'
+##}
+
+# This is a more sophisticated version of the above
 parse_git_branch() {
-    git name-rev HEAD 2> /dev/null | sed 's#HEAD\ \(.*\)# (git » \1)#'
+    local s=''
+    local branchName=''
+
+    # Check if the current directory is in a Git repository.
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    # Check for what branch we’re on.
+    # Get the short symbolic ref. If HEAD isn’t a symbolic ref, get a
+    # tracking remote branch or tag. Otherwise, get the
+    # short SHA for the latest commit, or give up.
+    branchName="$(git symbolic-ref --quiet --short HEAD 2> /dev/null || \
+        git describe --all --exact-match HEAD 2> /dev/null || \
+        git rev-parse --short HEAD 2> /dev/null || \
+        echo '(unknown)')"
+
+    # Early exit for Chromium & Blink repo, as the dirty check takes too long.
+    # Thanks, @paulirish!
+    # https://github.com/paulirish/dotfiles/blob/dd33151f/.bash_prompt#L110-L123
+    repoUrl="$(git config --get remote.origin.url)"
+
+    if grep -q 'chromium/src.git' <<< "${repoUrl}"
+        then
+            s+='*'
+        else
+            # Check for uncommitted changes in the index.
+            if ! $(git diff --quiet --ignore-submodules --cached)
+                then
+                    s+='+'
+            fi
+
+            # Check for unstaged changes.
+            if ! $(git diff-files --quiet --ignore-submodules --)
+                then
+                    s+='!'
+            fi
+
+            # Check for untracked files.
+            if [ -n "$(git ls-files --others --exclude-standard)" ]
+                then
+                    s+='?'
+            fi
+
+            # Check for stashed files.
+            if $(git rev-parse --verify refs/stash &>/dev/null)
+                then
+                    s+='$'
+            fi
+    fi
+
+    [ -n "${s}" ] && s=" [${s}]"
+
+   echo -e " (git » ${1}${branchName}${2}${s})"
 }
 
 
@@ -49,7 +111,7 @@ set_python_virtual_environment () {
         then
             python_virtual_environment=""
         else
-            python_virtual_environment="${Cyan}[`basename \"$VIRTUAL_ENV\"`]${Color_Off} "
+            python_virtual_environment="${Cyan}[Python virtual environment: `basename \"$VIRTUAL_ENV\"`]${Color_Off}\n"
     fi
 }
 
@@ -61,15 +123,25 @@ set_bash_prompt() {
 
     # set the versioning_system_branch variable
     set_versioning_system_branch
+#    prompt_git
 
     if [[ ${EUID} == 0 ]]
         then
             # root
-            PS1="${python_virtual_environment}${BRed}\u@\h${BBlue} \W \$${Red}${versioning_system_branch}${Color_Off} "
+            user_at_host_color=${BRed}
         else
             # normal user
-            PS1="${python_virtual_environment}${BGreen}\u@\h${BBlue} \w \$${Red}${versioning_system_branch}${Color_Off} "
+            user_at_host_color=${BGreen}
     fi
+
+    PS1="${python_virtual_environment}" # Python venv
+    PS1+="${user_at_host_color}\u@\h " # user@host
+    PS1+="${BBlue}\w " # Working directory
+    PS1+="\$" # Command prompt ($)
+    PS1+="${Red}${versioning_system_branch}" # Versioning system info
+    PS1+="${Color_Off}\n» " # Set cursor to new line
+
+    PS2="\[${Yellow}\]→ \[${Color_Off}\]"
 }
 
 # Tell bash to execute this function just before displaying its prompt.
