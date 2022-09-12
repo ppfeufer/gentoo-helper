@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Aliases
 alias ll='ls -rtlh'
 alias l='ls -lAh'
