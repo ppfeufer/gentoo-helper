@@ -123,7 +123,6 @@ set_bash_prompt() {
 
     # set the versioning_system_branch variable
     set_versioning_system_branch
-#    prompt_git
 
     if [[ ${EUID} == 0 ]]
         then
