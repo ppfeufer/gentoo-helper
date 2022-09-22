@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Update script for sys-kernel/gentoo-sources
 # This script is NOT tested with a kernel (previously) compiled by genkernel
