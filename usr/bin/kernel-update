@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Update script for sys-kernel/gentoo-sources
-# This script is NOT tested with a kernel (previously) compiled by genkernel
 
 selected_kernel=""
 kernel_base_directory="/usr/src/"
