@@ -100,18 +100,18 @@ if [ ${use_latest_kernel} == True ]
 fi
 
 
-# if no kernel is selected, show help text
+# If no kernel is selected, show help text
 if [ -z "${selected_kernel}" ]
     then
         usage
 fi
 
 
-#set the new kernel directory
+# Set the new kernel directory
 kernel_directory="${kernel_base_directory}${selected_kernel}"
 
 
-# compiling new kernel
+# Compiling new kernel
 compile_new_kernel() {
     echo "New Kernel Version: ${selected_kernel}"
 
