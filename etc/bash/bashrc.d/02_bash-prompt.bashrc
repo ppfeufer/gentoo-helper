@@ -134,7 +134,7 @@ set_bash_prompt() {
     fi
 
     PS1="${python_virtual_environment}" # Python venv
-    PS1+="${user_at_host_color}\u@\h " # user@host
+    PS1+="${user_at_host_color}\u@\H " # user@host
     PS1+="${BBlue}\w " # Working directory
     PS1+="\$" # Command prompt ($)
     PS1+="${Red}${versioning_system_branch}" # Versioning system info
