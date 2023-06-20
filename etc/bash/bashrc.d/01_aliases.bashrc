@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Aliases
-alias ll='ls -lh'
-alias la='ls -lAh'
+alias ll='lsd -lh'
+alias la='lsd -lAh'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias s='ssh -l root'
