@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
 # Aliases
-alias ll='lsd -lh'
-alias la='lsd -lAh'
+if command -v lsd > /dev/null
+    then
+        alias ll='lsd -lh'
+        alias la='lsd -lAh'
+    else
+        alias ll='ls -lh'
+        alias la='ls -lAh'
+fi
+
 alias ..='cd ..'
 alias ...='cd ../..'
 alias s='ssh -l root'
