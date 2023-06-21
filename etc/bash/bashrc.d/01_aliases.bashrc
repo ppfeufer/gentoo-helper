@@ -10,6 +10,11 @@ if command -v lsd > /dev/null
         alias la='ls -lAh'
 fi
 
+if command -v gcp > /dev/null
+    then
+        alias cp='gcp -v'
+fi
+
 alias ..='cd ..'
 alias ...='cd ../..'
 alias s='ssh -l root'
