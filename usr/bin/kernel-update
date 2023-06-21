@@ -13,9 +13,9 @@ number_of_kernel_to_keep=1
 
 # Check for installed programs
 declare -A is_installed=(
-    ['eclean-kernel']=False
+    ["eclean-kernel"]=False
+    ["nproc"]=False
 )
-
 
 for key in ${!is_installed[@]}
     do
@@ -24,6 +24,18 @@ for key in ${!is_installed[@]}
                 is_installed["${key}"]=True
         fi
     done
+
+
+# Check if `nproc` is installed
+if [ ${is_installed["nproc"]} == False ]
+    then
+        printf "Program 'nproc' is NOT installed.\n"
+        printf "Please run 'emerge sys-apps/coreutils' first."
+
+        exit 1
+fi
+
+NPROC=$(nproc) # Run `nproc` to get the number of cores
 
 
 usage() {
@@ -128,7 +140,7 @@ compile_new_kernel() {
     make olddefconfig
 
     echo "Building new kernel";
-    make -j12
+    make -j"${NPROC}"
 
     echo "Building modules";
     make modules
