@@ -153,7 +153,13 @@ compile_new_kernel() {
     fi
 
     echo "Re-compile kernel dependant modules";
-    emerge @module-rebuild
+    # Check if there is a custom script to update kernel modules
+    if command -v /usr/bin/update-kernel-modules > /dev/null
+        then
+            /usr/bin/update-kernel-modules
+        else
+            emerge @module-rebuild
+    fi
 
     echo "Kernel update complete. You may restart your computer now."
 
