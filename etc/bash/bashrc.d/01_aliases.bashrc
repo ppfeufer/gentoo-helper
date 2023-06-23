@@ -3,8 +3,8 @@
 # Aliases
 if command -v lsd > /dev/null
     then
-        alias ll='lsd -lh --header'
-        alias la='lsd -lAh --header'
+        alias ll='lsd -lh --header --group-directories-first'
+        alias la='lsd -lAh --header --group-directories-first'
     else
         alias ll='ls -lh'
         alias la='ls -lAh'
