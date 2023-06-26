@@ -20,5 +20,8 @@ alias ...='cd ../..'
 alias s='ssh -l root'
 alias please='sudo'
 
+# Good old `cls` command
+alias cls='clear'
+
 # Make aliases work with sudo
 alias sudo='sudo '
