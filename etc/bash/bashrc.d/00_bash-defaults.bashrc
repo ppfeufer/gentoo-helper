@@ -43,7 +43,7 @@ On_Purple="\[\033[45m\]"      # Purple
 On_Cyan="\[\033[46m\]"        # Cyan
 On_White="\[\033[47m\]"       # White
 
-# High Intensty
+# High Intensity
 IBlack="\[\033[0;90m\]"       # Black
 IRed="\[\033[0;91m\]"         # Red
 IGreen="\[\033[0;92m\]"       # Green
@@ -53,7 +53,7 @@ IPurple="\[\033[0;95m\]"      # Purple
 ICyan="\[\033[0;96m\]"        # Cyan
 IWhite="\[\033[0;97m\]"       # White
 
-# Bold High Intensty
+# Bold High Intensity
 BIBlack="\[\033[1;90m\]"      # Black
 BIRed="\[\033[1;91m\]"        # Red
 BIGreen="\[\033[1;92m\]"      # Green
@@ -63,7 +63,7 @@ BIPurple="\[\033[1;95m\]"     # Purple
 BICyan="\[\033[1;96m\]"       # Cyan
 BIWhite="\[\033[1;97m\]"      # White
 
-# High Intensty backgrounds
+# High Intensity backgrounds
 On_IBlack="\[\033[0;100m\]"   # Black
 On_IRed="\[\033[0;101m\]"     # Red
 On_IGreen="\[\033[0;102m\]"   # Green
