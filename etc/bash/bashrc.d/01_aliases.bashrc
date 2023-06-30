@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 
 # Aliases
+
+# BAT
+if command -v /usr/bin/bat > /dev/null
+    then
+        alias cat='/usr/bin/bat'
+fi
+
+if command -v /usr/bin/batcat > /dev/null
+    then
+        alias cat='/usr/bin/batcat'
+fi
+
+# LSD
 if command -v lsd > /dev/null
     then
         alias ll='lsd -lh --header --group-directories-first'
@@ -10,6 +23,7 @@ if command -v lsd > /dev/null
         alias la='ls -lAh'
 fi
 
+# GCP
 if command -v gcp > /dev/null
     then
         alias cp='gcp -v'
