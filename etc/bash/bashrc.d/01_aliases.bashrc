@@ -14,19 +14,19 @@ if command -v /usr/bin/batcat > /dev/null
 fi
 
 # LSD
-if command -v lsd > /dev/null
+if command -v /usr/bin/lsd > /dev/null
     then
-        alias ll='lsd -lh --header --group-directories-first'
-        alias la='lsd -lAh --header --group-directories-first'
+        alias ll='/usr/bin/lsd -lh --header --group-directories-first'
+        alias la='/usr/bin/lsd -lAh --header --group-directories-first'
     else
         alias ll='ls -lh'
         alias la='ls -lAh'
 fi
 
 # GCP
-if command -v gcp > /dev/null
+if command -v /usr/bin/gcp > /dev/null
     then
-        alias cp='gcp -v'
+        alias cp='/usr/bin/gcp -v'
 fi
 
 alias ..='cd ..'
