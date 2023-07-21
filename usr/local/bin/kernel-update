@@ -166,9 +166,9 @@ compile_new_kernel() {
 
     echo "Re-compile kernel dependant modules";
     # Check if there is a custom script to update kernel modules
-    if command -v /usr/bin/update-kernel-modules > /dev/null
+    if command -v /usr/local/bin/update-kernel-modules > /dev/null
         then
-            /usr/bin/update-kernel-modules
+            /usr/local/bin/update-kernel-modules
         else
             emerge @module-rebuild
     fi
