@@ -23,12 +23,6 @@ if command -v /usr/bin/lsd > /dev/null
         alias la='ls -lAh'
 fi
 
-# GCP
-if command -v /usr/bin/gcp > /dev/null
-    then
-        alias cp='/usr/bin/gcp -v'
-fi
-
 alias ..='cd ..'
 alias ...='cd ../..'
 alias s='ssh -l root'
