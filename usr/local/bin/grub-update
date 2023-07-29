@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+check_for_root_user() {
+    if [ "$(id -u)" != "0" ]
+        then
+            printf "${0} must be run as root\n"
+            exit 1
+    fi
+}
+
+check_for_root_user
+
+
+grub-install --target=x86_64-efi --efi-directory=/boot
