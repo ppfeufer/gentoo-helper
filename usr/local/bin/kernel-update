@@ -26,16 +26,18 @@ for key in ${!is_installed[@]}
     done
 
 
-# Check if `nproc` is installed
-if [ ${is_installed["nproc"]} == False ]
-    then
-        printf "Program 'nproc' is NOT installed.\n"
-        printf "Please run 'emerge sys-apps/coreutils' first."
+set_number_of_processes() {
+    # Check if `nproc` is installed
+    if [ ${is_installed["nproc"]} == False ]
+        then
+            printf "Program 'nproc' is NOT installed.\n"
+            printf "Please run 'emerge sys-apps/coreutils' first."
 
-        exit 1
-fi
+            exit 1
+    fi
 
-NPROC=$(nproc) # Run `nproc` to get the number of cores
+    number_make_jobs=$(nproc) # Run `nproc` to get the number of cores
+}
 
 
 usage() {
@@ -44,7 +46,7 @@ usage() {
 
     printf "\nExample:\n"
     printf "\t$0 --latest\t\t\t\tTo compile the latest kernel\n"
-    printf "\t$0 --eclean-kernel=2\t\tTo keep the latest 2 kernels in /boot/ for grub to detect\n"
+    printf "\t$0 --eclean-kernel=2\t\t\tTo keep the latest 2 kernels in /boot/ for grub to detect\n"
     printf "\t$0 --kernel=linux-5.17.7-gentoo\tTo compile a specific kernel version. (See available kernel versions below)\n"
 
     printf "\nOptions:\n"
@@ -59,6 +61,22 @@ usage() {
 
     exit 1;
 }
+
+
+check_for_root_user(){
+    if [ "$(id -u)" != "0" ]
+        then
+            printf "${0} must be run as root\n\n"
+
+            usage
+
+            exit 1
+    fi
+}
+
+
+check_for_root_user
+set_number_of_processes
 
 
 for i in "$@"
@@ -139,8 +157,8 @@ compile_new_kernel() {
     echo "Applying config via 'make olddefconfig'";
     make olddefconfig
 
-    echo "Building new kernel";
-    make -j"${NPROC}"
+    echo "Building new kernel with -j${number_make_jobs}";
+    make -j"${number_make_jobs}"
 
     echo "Building modules";
     make modules
