@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+check_for_root_user() {
+    if [ "$(id -u)" != "0" ]
+        then
+            printf "${0} must be run as root\n"
+            exit 1
+    fi
+}
+
+check_for_root_user
+
+
+export GRUB_USE_LINUX_LABEL=true
+
+cp /boot/grub/grub.cfg /boot/grub/grub.cfg.bak
+
+grub-mkconfig -o /boot/grub/grub.cfg
