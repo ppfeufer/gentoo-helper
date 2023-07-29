@@ -26,7 +26,7 @@ for key in ${!is_installed[@]}
     done
 
 
-set_number_of_processes() {
+set_number_of_make_jobs() {
     # Check if `nproc` is installed
     if [ ${is_installed["nproc"]} == False ]
         then
@@ -76,7 +76,7 @@ check_for_root_user(){
 
 
 check_for_root_user
-set_number_of_processes
+set_number_of_make_jobs
 
 
 for i in "$@"
