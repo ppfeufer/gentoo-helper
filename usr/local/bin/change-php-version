@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+selected_php_version=""
+use_latest_version=False
+
+check_for_root_user() {
+    if [ "$(id -u)" != "0" ]
+        then
+            printf "${0} must be run as root\n"
+            exit 1
+    fi
+}
+
+
+usage() {
+    printf "Usage:\n"
+    printf "\t$0 [OPTION]\n"
+
+    printf "\nExample:\n"
+    printf "\t$0 --latest\t\tTo use the latest PHP version\n"
+    printf "\t$0 --version=php8.3\tTo use a specific PHP version. (See available PHP versions below)\n"
+
+    printf "\nOptions:\n"
+    printf "\t-v, --version\tThe PHP version you want to use, see available PHP versions (Example: -v=php8.3)\n"
+
+    printf "\t-l, --latest\tUse the latest available version\n"
+
+    printf "\nAvailable PHP versions (current active version is marked with an asterisk):\n`eselect php list cli`\n" 1>&2;
+
+    exit 1;
+}
+
+
+
+for i in "$@"
+    do
+        case $i in
+            -v=* | --version=*)
+                selected_php_version="${i#*=}"
+                shift
+                ;;
+
+            -* | --*)
+                echo "Unknown option $i"
+                exit 1
+                ;;
+
+            -l | --latest)
+                use_latest_version=True
+                ;;
+
+            *)
+                usage
+                ;;
+        esac
+    done
+
+
+# If the latest available version should be used, make sure -v, --version are ignored
+if [ ${use_latest_version} == True ]
+    then
+        selected_php_version=$(eselect kernel list | tail -1 | awk '{print $2}' | sed 's/[][]//g')
+fi
+
+
+# If no kernel is selected, show help text
+if [ -z "${selected_php_version}" ]
+    then
+        usage
+fi
+
+
+switch_php_version() {
+    printf "New PHP Version: ${selected_php_version}"
+
+    printf "\n\nChanging PHP cli Version to: ${selected_php_version}"
+    eselect php set cli ${selected_php_version}
+
+    printf "\n\nChanging PHP cgi Version to: ${selected_php_version}"
+    eselect php set cgi ${selected_php_version}
+
+    printf "\n\nChanging PHP fpm Version to: ${selected_php_version}\n"
+    eselect php set fpm ${selected_php_version}
+
+    printf "\nChanging PHP Apach2 mod Version to: ${selected_php_version}\n"
+    eselect php set apache2 ${selected_php_version}
+
+    printf "\nChanging PHP phpdbg Version to: ${selected_php_version}\n\n"
+    eselect php set phpdbg ${selected_php_version}
+
+    printf "All set …\n"
+}
+
+
+check_for_root_user
+switch_php_version
