@@ -12,3 +12,7 @@ check_for_root_user
 
 
 grub-install --target=x86_64-efi --efi-directory=/boot
+
+# Rebuilding the config
+cp /boot/grub/grub.cfg /boot/grub/grub.cfg.bak
+grub-mkconfig -o /boot/grub/grub.cfg
