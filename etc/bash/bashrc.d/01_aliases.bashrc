@@ -31,6 +31,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias s='ssh -l root'
 alias please='sudo'
+alias mysql='mariadb'
 
 # Good old `cls` command
 alias cls='clear'
